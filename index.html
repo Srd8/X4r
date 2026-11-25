@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Getgems Telegram NFT — AR / EN</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <style>
+    :root {
+      --bg: #0c0d10;
+      --panel: #14161b;
+      --panel-2: #1b1e25;
+      --border: #262a34;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #0098ea;
+      --star: #ffb800;
+      --green: #16a34a;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding: 14px; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 10px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 14px; margin-bottom: 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .lang-btn {
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 7px 11px; font-size: 12px; font-weight: 700; cursor: pointer; width: auto;
+    }
+    .wallet-bar {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--muted);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    }
+    .status-banner {
+      background: var(--panel); border: 1px solid #7f1d1d; border-radius: 12px;
+      padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #fca5a5; display: none;
+    }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .stat-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px; text-align: center;
+    }
+    .stat-num { font-size: 15px; font-weight: 800; color: var(--star); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+      padding: 14px; margin-bottom: 14px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    input {
+      width: 100%; background: var(--panel-2); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px;
+      margin-bottom: 10px; font-size: 13px;
+    }
+    .photo-preview {
+      width: 84px; height: 84px; border-radius: 12px; object-fit: cover;
+      border: 1px solid var(--border); display: none; margin-bottom: 10px;
+    }
+    .row { display: flex; gap: 8px; align-items: center; }
+    button {
+      background: var(--accent); color: #fff; border: none; border-radius: 10px;
+      padding: 9px 12px; font-weight: 700; cursor: pointer; font-size: 12px; width: 100%;
+    }
+    .btn-free { background: var(--green); color: #fff; margin-top: 6px; }
+    .btn-star { background: var(--star); color: #111; width: auto; white-space: nowrap; }
+    .btn-selected { background: #2563eb !important; border: 1px solid #93c5fd; }
+    .gifts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 720px) {
+      .gifts-grid { grid-template-columns: repeat(4, 1fr); }
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    }
+    .gift-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .gift-visual {
+      height: 86px; border-radius: 10px; background: var(--panel-2);
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
+      margin-bottom: 8px; overflow: hidden;
+    }
+    .gift-visual img { width: 100%; height: 100%; object-fit: cover; }
+    .gift-price { color: var(--star); font-weight: 800; font-size: 13px; margin: 4px 0; }
+    .gift-meta { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .bundle-chip {
+      display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2);
+      border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px;
+      font-size: 11px; margin: 3px;
+    }
+    .list-item {
+      border-bottom: 1px solid var(--border); padding: 8px 0; font-size: 12px;
+      display: flex; justify-content: space-between; gap: 8px; color: var(--muted);
+    }
+    .list-item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span>Getgems Telegram NFT</span>
+      <span id="roleBadge" style="font-size:11px; color:var(--muted);"></span>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="lang-btn" id="langToggleBtn" onclick="toggleLanguage()">English 🇬🇧</button>
+      <div id="ton-connect"></div>
+    </div>
+  </div>
+
+  <div class="wallet-bar">
+    <span id="walletStatusLabel">محفظة تيليجرام (TON Wallet): غير متصلة</span>
+    <span id="walletAddressShort" style="color:var(--accent); font-weight:700;"></span>
+  </div>
+
+  <div id="statusBanner" class="status-banner"></div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="freePoolStars">0 ⭐</div>
+      <div class="stat-label" id="lblPool">رصيد الإنشاء المجاني (أدمن)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="dbStatus">--</div>
+      <div class="stat-label" id="lblDb">قاعدة البيانات</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="collectionsCount">0</div>
+      <div class="stat-label" id="lblCols">مجموعات Getgems</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title" id="titleDonate">⭐ إرسال نجوم للبوت لتشغيل الإنشاء المجاني</div>
+      <label id="lblDonate">أرسل نجوماً للبوت مباشرة أو أرسل هدية للبوت في المحادثة لزيادة الرصيد المجاني:</label>
+      <div class="row">
+        <input type="number" id="donateStarsInput" value="50" min="1" style="margin:0;" />
+        <button class="btn-star" id="btnDonate" onclick="donateToBot()">إرسال نجوم للبوت</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="titleCustom">🖼️ صورة الهاتف وتخصيص حزمة هدايا NFT</div>
+      <label id="lblPhoto">اختر صورة من الهاتف لتخصيص الهدية / الحزمة:</label>
+      <input type="file" id="phonePhotoInput" accept="image/*" onchange="handlePhotoChange(event)" />
+      <img id="photoPreview" class="photo-preview" alt="Preview" />
+
+      <label id="lblBundleName">اسم حزمة NFT المخصصة:</label>
+      <div class="row" style="margin-bottom:8px;">
+        <input type="text" id="bundleNameInput" placeholder="Lofy66 / VIP Bundle" style="margin:0;" />
+        <button type="button" class="btn-star" id="btnSaveBundle" onclick="saveBundle()">حفظ الحزمة</button>
+      </div>
+      <div id="selectedBundleBox" style="font-size:12px; color:var(--muted);"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="two-col">
+      <div>
+        <label id="lblTarget">معرف المستلم (Telegram User ID — اتركه فارغاً للإرسال لحسابك):</label>
+        <input type="number" id="targetUserIdInput" placeholder="5220076610" style="margin-bottom:0;" />
+      </div>
+      <div>
+        <label id="lblMsg">رسالة الهدية / الـ NFT:</label>
+        <input type="text" id="giftTextInput" placeholder="Telegram NFT Gift 🚀🗿" style="margin-bottom:0;" />
+      </div>
+    </div>
+  </div>
+
+  <div id="loadingText" style="text-align:center; padding:16px; color:var(--muted);"></div>
+  <div class="gifts-grid" id="giftsGrid"></div>
+
+  <div class="two-col" style="margin-top:14px;">
+    <div class="card">
+      <div class="card-title" id="titleSavedBundles">📦 الحزم المخصصة المحفوظة</div>
+      <div id="bundlesList" style="font-size:12px; color:var(--muted);"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" id="titleHistory">📜 سجل الإصدارات الحقيقية</div>
+      <div id="historyList" style="font-size:12px; color:var(--muted);"></div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_ID = '5220076610';
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const tgLang = tg?.initDataUnsafe?.user?.language_code || '';
+    let currentLang = urlParams.get('lang') || (tgLang.startsWith('en') ? 'en' : 'ar');
+
+    const I18N = {
+      ar: {
+        toggleBtn: 'English 🇬🇧',
+        adminRole: '(وضع الأدمن — إنشاء مجاني متاح)',
+        walletDisconnected: 'محفظة تيليجرام (TON Wallet): غير متصلة — اضغط Connect Wallet للربط',
+        walletConnected: 'محفظة تيليجرام متصلة بنجاح ✅:',
+        lblPool: 'رصيد الإنشاء المجاني (أدمن)',
+        lblDb: 'قاعدة البيانات',
+        lblCols: 'مجموعات Getgems',
+        dbConnected: 'متصل',
+        dbDisconnected: 'غير متصل',
+        titleDonate: '⭐ إرسال نجوم للبوت لتشغيل الإنشاء المجاني',
+        lblDonate: 'أرسل نجوماً للبوت مباشرة أو أرسل هدية للبوت في المحادثة لزيادة الرصيد المجاني:',
+        btnDonate: 'إرسال نجوم للبوت',
+        titleCustom: '🖼️ صورة الهاتف وتخصيص حزمة هدايا NFT',
+        lblPhoto: 'اختر صورة من الهاتف لتخصيص الهدية / الحزمة:',
+        lblBundleName: 'اسم حزمة NFT المخصصة:',
+        btnSaveBundle: 'حفظ الحزمة',
+        bundleEmpty: 'اختر هدية واحدة على الأقل من البطاقات بالأسفل لإضافتها إلى الحزمة الحالية.',
+        lblTarget: 'معرف المستلم (Telegram User ID — اتركه فارغاً للإرسال لحسابك):',
+        lblMsg: 'رسالة الهدية / الـ NFT:',
+        loading: 'جاري جلب الهدايا الحقيقية من Telegram API وبيانات Getgems...',
+        titleSavedBundles: '📦 الحزم المخصصة المحفوظة',
+        titleHistory: '📜 سجل الإصدارات الحقيقية',
+        noBundles: 'لا توجد حزم محفوظة بعد.',
+        noHistory: 'لا توجد إصدارات مسجلة بعد.',
+        mintPay: (s) => `إصدار بنجوم (${s}⭐)`,
+        mintFree: 'إنشاء مجاني (أدمن)',
+        addBundle: '+ إضافة إلى الحزمة',
+        inBundle: '✓ مضافة إلى الحزمة',
+        available: 'المتاح',
+        openSupply: 'مفتوح',
+        starUpgrade: 'نجمة (ترقية NFT)',
+        freeBadge: 'مجاني (أدمن)',
+        starsBadge: 'نجوم',
+        errBundleName: 'أدخل اسم الحزمة أولاً.',
+        errBundleItems: 'اختر هدية واحدة على الأقل من البطاقات لإضافتها إلى الحزمة.',
+        okBundleSaved: 'تم حفظ حزمة NFT المخصصة بنجاح في قاعدة البيانات.',
+        okStarsSent: 'تم إرسال النجوم للبوت بنجاح!',
+        okGiftPaid: 'تم الدفع بالنجوم بنجاح! جاري إرسال الهدية وترقيتها إلى NFT.'
+      },
+      en: {
+        toggleBtn: 'العربية 🇮🇶',
+        adminRole: '(Admin Mode — Free Mint Enabled)',
+        walletDisconnected: 'Telegram TON Wallet: Not connected — Tap Connect Wallet',
+        walletConnected: 'Telegram Wallet Connected ✅:',
+        lblPool: 'Free Admin Mint Pool',
+        lblDb: 'Database Status',
+        lblCols: 'Getgems Collections',
+        dbConnected: 'Connected',
+        dbDisconnected: 'Disconnected',
+        titleDonate: '⭐ Send Stars to Bot to Power Free Minting',
+        lblDonate: 'Send Telegram Stars directly here or send a Gift to the bot in chat to fund free admin mints:',
+        btnDonate: 'Send Stars to Bot',
+        titleCustom: '🖼️ Phone Photo & Custom NFT Bundle',
+        lblPhoto: 'Select a photo from your phone to customize gift/bundle preview:',
+        lblBundleName: 'Custom NFT Bundle Name:',
+        btnSaveBundle: 'Save Bundle',
+        bundleEmpty: 'Select at least one gift from the cards below to add it to your current bundle.',
+        lblTarget: 'Recipient Telegram User ID (leave blank to send to yourself):',
+        lblMsg: 'Gift / NFT Message:',
+        loading: 'Fetching real Telegram Gifts & Getgems data via Python backend...',
+        titleSavedBundles: '📦 Saved Custom Bundles',
+        titleHistory: '📜 Real Minted NFTs History',
+        noBundles: 'No saved bundles yet.',
+        noHistory: 'No minted NFTs recorded yet.',
+        mintPay: (s) => `Mint with Stars (${s}⭐)`,
+        mintFree: 'Free Mint (Admin)',
+        addBundle: '+ Add to Bundle',
+        inBundle: '✓ Added to Bundle',
+        available: 'Supply',
+        openSupply: 'Open',
+        starUpgrade: 'Stars (NFT Upgrade)',
+        freeBadge: 'Free (Admin)',
+        starsBadge: 'Stars',
+        errBundleName: 'Please enter a bundle name first.',
+        errBundleItems: 'Please select at least one gift card to add to the bundle.',
+        okBundleSaved: 'Custom NFT bundle saved to database successfully.',
+        okStarsSent: 'Stars sent to bot balance successfully!',
+        okGiftPaid: 'Payment successful! Sending & upgrading your real Telegram NFT gift.'
+      }
+    };
+
+    let connectedWalletAddress = null;
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: `${window.location.origin}/tonconnect-manifest.json`,
+      buttonRootId: 'ton-connect',
+      walletsListConfiguration: {
+        includeWallets: [
+          {
+            appName: 'telegram-wallet',
+            name: 'Wallet',
+            imageUrl: 'https://wallet.tg/images/logo-288.png',
+            aboutUrl: 'https://wallet.tg/',
+            universalLink: 'https://t.me/wallet?attach=wallet',
+            bridgeUrl: 'https://bridge.ton.space/bridge',
+            platforms: ['ios', 'android', 'macos', 'windows', 'linux']
+          }
+        ]
+      }
+    });
+
+    tonConnectUI.onStatusChange((wallet) => {
+      const t = I18N[currentLang];
+      if (wallet && wallet.account && wallet.account.address) {
+        connectedWalletAddress = wallet.account.address;
+        const shortAddr = `${connectedWalletAddress.slice(0, 6)}...${connectedWalletAddress.slice(-6)}`;
+        document.getElementById('walletStatusLabel').innerText = t.walletConnected;
+        document.getElementById('walletAddressShort').innerText = shortAddr;
+      } else {
+        connectedWalletAddress = null;
+        document.getElementById('walletStatusLabel').innerText = t.walletDisconnected;
+        document.getElementById('walletAddressShort').innerText = '';
+      }
+    });
+
+    const currentUserId = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id)
+      ? String(tg.initDataUnsafe.user.id)
+      : ADMIN_ID;
+
+    let customPhotoDataUrl = null;
+    let activeBundleItems = [];
+    let latestServerData = null;
+
+    function applyTranslations() {
+      const t = I18N[currentLang];
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+      document.getElementById('langToggleBtn').innerText = t.toggleBtn;
+      document.getElementById('roleBadge').innerText =
+        String(currentUserId) === ADMIN_ID ? t.adminRole : `(ID: ${currentUserId})`;
+
+      document.getElementById('walletStatusLabel').innerText = connectedWalletAddress
+        ? t.walletConnected
+        : t.walletDisconnected;
+
+      document.getElementById('lblPool').innerText = t.lblPool;
+      document.getElementById('lblDb').innerText = t.lblDb;
+      document.getElementById('lblCols').innerText = t.lblCols;
+      document.getElementById('titleDonate').innerText = t.titleDonate;
+      document.getElementById('lblDonate').innerText = t.lblDonate;
+      document.getElementById('btnDonate').innerText = t.btnDonate;
+      document.getElementById('titleCustom').innerText = t.titleCustom;
+      document.getElementById('lblPhoto').innerText = t.lblPhoto;
+      document.getElementById('lblBundleName').innerText = t.lblBundleName;
+      document.getElementById('btnSaveBundle').innerText = t.btnSaveBundle;
+      document.getElementById('lblTarget').innerText = t.lblTarget;
+      document.getElementById('lblMsg').innerText = t.lblMsg;
+      document.getElementById('loadingText').innerText = t.loading;
+      document.getElementById('titleSavedBundles').innerText = t.titleSavedBundles;
+      document.getElementById('titleHistory').innerText = t.titleHistory;
+
+      renderBundleBox();
+      if (latestServerData) {
+        renderServerData(latestServerData);
+      }
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      applyTranslations();
+    }
+
+    function notifyUser(msg) {
+      if (tg && tg.showAlert) {
+        tg.showAlert(msg);
+      } else {
+        alert(msg);
+      }
+    }
+
+    function handlePhotoChange(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        customPhotoDataUrl = reader.result;
+        const img = document.getElementById('photoPreview');
+        img.src = customPhotoDataUrl;
+        img.style.display = 'block';
+        if (latestServerData) renderGiftsGrid(latestServerData.gifts || []);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function toggleGiftInBundle(giftId, title, totalStars) {
+      const idx = activeBundleItems.findIndex((i) => String(i.giftId) === String(giftId));
+      if (idx >= 0) {
+        activeBundleItems.splice(idx, 1);
+      } else {
+        activeBundleItems.push({ giftId, title, stars: totalStars });
+      }
+      renderBundleBox();
+      if (latestServerData) renderGiftsGrid(latestServerData.gifts || []);
+    }
+
+    function renderBundleBox() {
+      const t = I18N[currentLang];
+      const box = document.getElementById('selectedBundleBox');
+      if (!activeBundleItems.length) {
+        box.innerText = t.bundleEmpty;
+        return;
+      }
+      const sum = activeBundleItems.reduce((a, b) => a + Number(b.stars || 0), 0);
+      const label = currentLang === 'ar' ? 'إجمالي نجوم الحزمة:' : 'Bundle Total Stars:';
+      box.innerHTML = `
+        <div style="margin-bottom:6px; color:#f3f4f6;">${label} <b>${sum} ⭐</b> (${activeBundleItems.length})</div>
+        <div>${activeBundleItems.map((i) => `<span class="bundle-chip">${i.title} (${i.stars}⭐)</span>`).join('')}</div>
+      `;
+    }
+
+    async function saveBundle() {
+      const t = I18N[currentLang];
+      const bundleName = document.getElementById('bundleNameInput').value.trim();
+      if (!bundleName) return notifyUser(t.errBundleName);
+      if (!activeBundleItems.length) return notifyUser(t.errBundleItems);
+
+      const res = await fetch('/api/create-gift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_bundle',
+          lang: currentLang,
+          userId: currentUserId,
+          bundleName,
+          bundleItems: activeBundleItems
+        })
+      });
+      const data = await res.json();
+      if (!data.ok) return notifyUser(data.error || 'Error');
+
+      notifyUser(t.okBundleSaved);
+      document.getElementById('bundleNameInput').value = '';
+      activeBundleItems = [];
+      renderBundleBox();
+      loadPlatform();
+    }
+
+    async function donateToBot() {
+      const t = I18N[currentLang];
+      const donateStars = Number(document.getElementById('donateStarsInput').value) || 50;
+      const res = await fetch('/api/create-gift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'donate_to_bot',
+          lang: currentLang,
+          userId: currentUserId,
+          donateStars
+        })
+      });
+      const data = await res.json();
+      if (!data.ok) return notifyUser(data.error || 'Error');
+
+      if (tg && tg.openInvoice) {
+        tg.openInvoice(data.invoiceLink, (status) => {
+          if (status === 'paid') {
+            notifyUser(t.okStarsSent);
+            setTimeout(loadPlatform, 1500);
+          }
+        });
+      } else {
+        window.open(data.invoiceLink, '_blank');
+      }
+    }
+
+    async function mintGift(giftId, giftTitle, starCount, upgradeCost, mode) {
+      const t = I18N[currentLang];
+      const targetUserId = document.getElementById('targetUserIdInput').value.trim();
+      const giftText = document.getElementById('giftTextInput').value.trim();
+
+      const res = await fetch('/api/create-gift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: mode,
+          lang: currentLang,
+          userId: currentUserId,
+          targetUserId,
+          giftId,
+          giftTitle,
+          starCount,
+          upgradeCost,
+          giftText,
+          walletAddress: connectedWalletAddress,
+          photoDataUrl: customPhotoDataUrl,
+          bundleItems: activeBundleItems
+        })
+      });
+      const data = await res.json();
+      if (!data.ok) return notifyUser(data.error || 'Error');
+
+      if (data.mode === 'ADMIN_FREE') {
+        notifyUser(data.message);
+        loadPlatform();
+        return;
+      }
+      if (data.mode === 'INVOICE' && data.invoiceLink) {
+        if (tg && tg.openInvoice) {
+          tg.openInvoice(data.invoiceLink, (status) => {
+            if (status === 'paid') {
+              notifyUser(t.okGiftPaid);
+              setTimeout(loadPlatform, 1500);
+            }
+          });
+        } else {
+          window.open(data.invoiceLink, '_blank');
+        }
+      }
+    }
+
+    function renderGiftsGrid(gifts) {
+      const t = I18N[currentLang];
+      const grid = document.getElementById('giftsGrid');
+      grid.innerHTML = '';
+
+      if (!gifts || !gifts.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--muted); padding:20px;">No gifts returned from Telegram API.</div>`;
+        return;
+      }
+
+      gifts.forEach((gift) => {
+        const upgradeCost = Number(gift.upgrade_star_count || 25);
+        const totalStars = Number(gift.star_count || 0) + upgradeCost;
+        const emoji = (gift.sticker && gift.sticker.emoji) || '🎁';
+        const title = `Gift #${gift.id}`;
+        const visualHtml = customPhotoDataUrl
+          ? `<img src="${customPhotoDataUrl}" alt="${title}" />`
+          : `<span>${emoji}</span>`;
+
+        const isSelected = activeBundleItems.some((i) => String(i.giftId) === String(gift.id));
+
+        const card = document.createElement('div');
+        card.className = 'gift-card';
+        card.innerHTML = `
+          <div>
+            <div class="gift-visual">${visualHtml}</div>
+            <div style="font-size:13px; font-weight:700;">${emoji} ${title}</div>
+            <div class="gift-price">⭐ ${totalStars} ${t.starUpgrade}</div>
+            <div class="gift-meta">${t.available}: ${gift.remaining_count ?? t.openSupply}</div>
+          </div>
+          <div>
+            <button onclick="mintGift('${gift.id}', '${title}', ${gift.star_count || 0}, ${upgradeCost}, 'user_pay')">${t.mintPay(totalStars)}</button>
+            <button class="btn-free" onclick="mintGift('${gift.id}', '${title}', ${gift.star_count || 0}, ${upgradeCost}, 'admin_free')">${t.mintFree}</button>
+            <button class="${isSelected ? 'btn-selected' : ''}" style="background:${isSelected ? '#2563eb' : '#262a34'}; margin-top:6px;" onclick="toggleGiftInBundle('${gift.id}', '${title}', ${totalStars})">
+              ${isSelected ? t.inBundle : t.addBundle}
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderServerData(data) {
+      latestServerData = data;
+      const t = I18N[currentLang];
+
+      document.getElementById('freePoolStars').innerText = `${data.totalFreePoolStars ?? 0} ⭐`;
+      document.getElementById('dbStatus').innerText = data.dbConnected ? t.dbConnected : t.dbDisconnected;
+      document.getElementById('collectionsCount').innerText = (data.getgemsCollections || []).length;
+
+      const banner = document.getElementById('statusBanner');
+      if (!data.dbConnected) {
+        banner.style.display = 'block';
+        banner.innerText = currentLang === 'ar'
+          ? 'تنبيه: قاعدة البيانات غير متصلة حالياً. أضف SUPABASE_URL و SUPABASE_SERVICE_ROLE_KEY في Vercel ثم أعد النشر (Redeploy).'
+          : 'Notice: Database is disconnected. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables and Redeploy.';
+      } else {
+        banner.style.display = 'none';
+      }
+
+      renderGiftsGrid(data.gifts || []);
+
+      const bundlesEl = document.getElementById('bundlesList');
+      if (data.bundles && data.bundles.length) {
+        bundlesEl.innerHTML = data.bundles.map((b) => `
+          <div class="list-item">
+            <span><b>${b.bundle_name}</b> (${(b.items || []).length})</span>
+            <span>${b.total_stars} ⭐</span>
+          </div>
+        `).join('');
+      } else {
+        bundlesEl.innerText = t.noBundles;
+      }
+
+      const historyEl = document.getElementById('historyList');
+      if (data.history && data.history.length) {
+        historyEl.innerHTML = data.history.map((h) => `
+          <div class="list-item">
+            <span>${h.recipient_id} • ${h.gift_title || h.gift_id}</span>
+            <span>${h.mode === 'ADMIN_FREE' ? t.freeBadge : t.starsBadge} (${h.stars_used}⭐)</span>
+          </div>
+        `).join('');
+      } else {
+        historyEl.innerText = t.noHistory;
+      }
+    }
+
+    async function loadPlatform() {
+      try {
+        const res = await fetch('/api/create-gift');
+        const data = await res.json();
+        document.getElementById('loadingText').style.display = 'none';
+        renderServerData(data);
+      } catch (err) {
+        document.getElementById('loadingText').innerText = 'Backend connection error.';
+      }
+    }
+
+    applyTranslations();
+    loadPlatform();
+  </script>
+</body>
+</html>
